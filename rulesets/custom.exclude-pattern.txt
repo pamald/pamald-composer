@@ -1,0 +1,4 @@
+tests/_data/fixtures/
+tests/_support/_generated/
+tests/_log/
+tests/_output/

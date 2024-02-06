@@ -1,0 +1,74 @@
+{
+    "type": "library",
+    "name": "pamald/pamald-composer",
+    "description": "Collects lock diff information from composer.lock files.",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "Andor",
+            "role": "Maintainer",
+            "homepage": "https://github.com/Sweetchuck"
+        }
+    ],
+    "homepage": "https://github.com/pamald/pamald",
+    "support": {
+        "source": "https://github.com/pamald/pamald-composer",
+        "issues": "https://github.com/pamald/pamald-composer/issues"
+    },
+    "license": "LGPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "sweetchuck/git-hooks": true,
+            "sweetchuck/composer-suite": true
+        },
+        "preferred-install": {
+          "*": "dist"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "repositories": {
+        "pamald/pamald": {
+            "type": "github",
+            "url": "https://github.com/pamald/pamald.git"
+        }
+    },
+    "require": {
+        "php": ">=8.3",
+        "pamald/pamald": "1.x-dev"
+    },
+    "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-asserts": "^3.0",
+        "consolidation/robo": "^5.0",
+        "maddhatter/markdown-table": "^1.2",
+        "mikey179/vfsstream": "^1.6",
+        "nuvoleweb/robo-config": "3.x-dev",
+        "phpstan/phpstan": "^1.11",
+        "squizlabs/php_codesniffer": "^3.6",
+        "sweetchuck/composer-suite": "1.x-dev",
+        "sweetchuck/git-hooks": "2.x-dev",
+        "sweetchuck/robo-git": "4.x-dev",
+        "sweetchuck/robo-phpcs": "4.x-dev",
+        "sweetchuck/robo-phpmd": "4.x-dev",
+        "sweetchuck/robo-phpstan": "3.x-dev",
+        "symfony/console": "^7.0",
+        "symfony/error-handler": "^7.0",
+        "symfony/filesystem": "^7.0",
+        "symfony/finder": "^7.0",
+        "symfony/yaml": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pamald\\PamaldComposer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pamald\\PamaldComposer\\Tests\\Unit\\": "tests/unit/",
+            "Pamald\\PamaldComposer\\Tests\\": "tests/_support/"
+        }
+    }
+}
