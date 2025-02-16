@@ -6,18 +6,8 @@ parameters:
 			path: ../RoboFile.php
 
 		-
-			message: "#^Call to an undefined method Robo\\\\Collection\\\\CollectionBuilder\\:\\:setInputFile\\(\\)\\.$#"
-			count: 1
-			path: ../RoboFile.php
-
-		-
 			message: "#^Call to an undefined method Robo\\\\Collection\\\\CollectionBuilder\\|Robo\\\\Collection\\\\TaskForEach\\:\\:iterationMessage\\(\\)\\.$#"
 			count: 1
-			path: ../RoboFile.php
-
-		-
-			message: "#^Call to an undefined method Robo\\\\Collection\\\\CollectionBuilder\\|Robo\\\\Task\\\\Filesystem\\\\FilesystemStack\\:\\:mkdir\\(\\)\\.$#"
-			count: 4
 			path: ../RoboFile.php
 
 		-

@@ -4,19 +4,19 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer\Tests\Unit;
 
-use Codeception\Attribute\DataProvider;
 use Pamald\PamaldComposer\PackageCollector;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
-/**
- * @covers \Pamald\PamaldComposer\PackageCollector
- */
+#[CoversClass(PackageCollector::class)]
 class PackageCollectorTest extends TestBase
 {
 
     /**
      * @return array<string, mixed>
      */
-    public function casesCollect(): array
+    public static function casesCollect(): array
     {
         return [
             'empty' => [
@@ -84,6 +84,7 @@ class PackageCollectorTest extends TestBase
      * @param array<string, mixed> $lock
      * @param array<string, mixed> $json
      */
+    #[Test]
     #[DataProvider('casesCollect')]
     public function testCollect(array $expected, array $lock, ?array $json): void
     {
@@ -92,13 +93,13 @@ class PackageCollectorTest extends TestBase
         /** @var array<string, \Pamald\Pamald\PackageInterface&\JsonSerializable> $actual */
         $actual = $collector->collect($lock, $json);
 
-        $this->tester->assertCount(
+        static::assertCount(
             count($expected),
             $actual,
             'actual has the right amount of items',
         );
         foreach ($expected as $expectedName => $expectedValues) {
-            $this->tester->assertArrayHasKey($expectedName, $actual);
+            static::assertArrayHasKey($expectedName, $actual);
             $this->assertSame(
                 $expectedValues,
                 $actual[$expectedName]->jsonSerialize(),

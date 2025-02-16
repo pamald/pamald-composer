@@ -4,17 +4,24 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer\Tests\Unit;
 
-use Codeception\Test\Unit;
-use Pamald\PamaldComposer\Tests\UnitTester;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Path;
 
-class TestBase extends Unit
+class TestBase extends TestCase
 {
 
-    protected UnitTester $tester;
-
-    protected function selfProjectRoot(): string
+    protected static function selfProjectRoot(): string
     {
-        return dirname(__DIR__, 2);
+        return dirname(__DIR__, 3);
+    }
+
+    protected static function getFixturesDir(): string
+    {
+        return Path::join(
+            static::selfProjectRoot(),
+            'tests',
+            'fixtures',
+        );
     }
 
     protected function createTempDir(): string
@@ -30,7 +37,7 @@ class TestBase extends Unit
         return implode('/', [
             sys_get_temp_dir(),
             'pamald',
-            'pamald',
+            'pamald-composer',
             'test-' . $this->randomId(),
         ]);
     }

@@ -1,5 +1,6 @@
 ### Common.
 /.cache/
+/reports/
 
 ### Composer.
 /vendor/
@@ -13,11 +14,8 @@
 /composer.*.json
 /composer.*.lock
 
-### Codeception.
-/tests/_output/
-/tests/_support/_generated
-/tests/*.suite.yml
-/codeception.yml
+### PhpUnit.
+/phpunit.xml
 
 ### sweetchuck/git-hooks.
 /.git-hooks.local

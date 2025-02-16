@@ -4,19 +4,22 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer\Tests\Unit;
 
-use Codeception\Attribute\DataProvider;
 use Pamald\Pamald\LockDiffEntry;
 use Pamald\Pamald\LockDiffer;
 use Pamald\Pamald\Reporter\ConsoleTableReporter;
+use Pamald\PamaldComposer\NormalPackage;
 use Pamald\PamaldComposer\PackageCollector;
+use Pamald\PamaldComposer\PhpCorePackage;
+use Pamald\PamaldComposer\PhpExtPackage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Sweetchuck\Utils\Filter\CustomFilter;
 
-/**
- * @covers \Pamald\PamaldComposer\PackageCollector
- * @covers \Pamald\PamaldComposer\PhpCorePackage
- * @covers \Pamald\PamaldComposer\PhpExtPackage
- * @covers \Pamald\PamaldComposer\NormalPackage
- */
+#[CoversClass(PackageCollector::class)]
+#[CoversClass(PhpCorePackage::class)]
+#[CoversClass(PhpExtPackage::class)]
+#[CoversClass(NormalPackage::class)]
 class ConsoleTableReporterTest extends TestBase
 {
 
@@ -25,14 +28,14 @@ class ConsoleTableReporterTest extends TestBase
      */
     protected array $streams = [];
 
-    protected function _after(): void
+    protected function tearDown(): void
     {
-        parent::_after();
-
         foreach ($this->streams as $stream) {
             fclose($stream);
         }
         $this->streams = [];
+
+        parent::tearDown();
     }
 
     /**
@@ -189,6 +192,7 @@ class ConsoleTableReporterTest extends TestBase
      * @param null|array<string, mixed> $rightJson
      * @phpstan-param pamald-console-table-reporter-options $options
      */
+    #[Test]
     #[DataProvider('casesGenerate')]
     public function testGenerate(
         string $expected,
@@ -213,7 +217,7 @@ class ConsoleTableReporterTest extends TestBase
             ->setOptions($options)
             ->generate($entries);
         rewind($options['stream']);
-        $this->tester->assertSame(
+        static::assertSame(
             $expected,
             stream_get_contents($options['stream']),
         );
