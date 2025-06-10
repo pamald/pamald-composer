@@ -4,13 +4,16 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer\Tests\Unit;
 
-use Pamald\PamaldComposer\PackageCollector;
+use Pamald\Pamald\DependencyEnvironment;
+use Pamald\Pamald\DependencyLink;
+use Pamald\Pamald\DependencyType;
+use Pamald\PamaldComposer\DependencyCollector;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
-#[CoversClass(PackageCollector::class)]
-class PackageCollectorTest extends TestBase
+#[CoversClass(DependencyCollector::class)]
+class DependencyCollectorTest extends TestBase
 {
 
     /**
@@ -28,26 +31,34 @@ class PackageCollectorTest extends TestBase
                 'expected' => [
                     'php' => [
                         'name' => 'php',
+                        'type' => DependencyType::Platform,
+                        'link' =>DependencyLink::Required,
+                        'environment' => DependencyEnvironment::Production,
                         'versionString' => '>=8.3',
-                        'typeOfRelationship' => 'prod',
                         'isDirectDependency' => true,
                     ],
                     'ext-imagick' => [
                         'name' => 'ext-imagick',
+                        'type' => DependencyType::Platform,
+                        'link' =>DependencyLink::Required,
+                        'environment' => DependencyEnvironment::Production,
                         'versionString' => '*',
-                        'typeOfRelationship' => 'prod',
                         'isDirectDependency' => true,
                     ],
                     'a/b' => [
                         'name' => 'a/b',
+                        'type' => DependencyType::Package,
+                        'link' =>DependencyLink::Required,
+                        'environment' => DependencyEnvironment::Production,
                         'versionString' => '1.2.3',
-                        'typeOfRelationship' => 'prod',
                         'isDirectDependency' => true,
                     ],
                     'a/c' => [
                         'name' => 'a/c',
+                        'type' => DependencyType::Package,
+                        'link' =>DependencyLink::Required,
+                        'environment' => DependencyEnvironment::Development,
                         'versionString' => '3.4.0',
-                        'typeOfRelationship' => 'dev',
                         'isDirectDependency' => true,
                     ],
                 ],
@@ -88,9 +99,9 @@ class PackageCollectorTest extends TestBase
     #[DataProvider('casesCollect')]
     public function testCollect(array $expected, array $lock, ?array $json): void
     {
-        $collector = new PackageCollector();
+        $collector = new DependencyCollector();
 
-        /** @var array<string, \Pamald\Pamald\PackageInterface&\JsonSerializable> $actual */
+        /** @var array<string, \Pamald\Pamald\DependencyInterface&\JsonSerializable> $actual */
         $actual = $collector->collect($lock, $json);
 
         static::assertCount(

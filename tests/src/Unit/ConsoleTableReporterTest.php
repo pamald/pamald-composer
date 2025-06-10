@@ -4,22 +4,23 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer\Tests\Unit;
 
-use Pamald\Pamald\LockDiffEntry;
 use Pamald\Pamald\LockDiffer;
 use Pamald\Pamald\Reporter\ConsoleTableReporter;
-use Pamald\PamaldComposer\NormalPackage;
-use Pamald\PamaldComposer\PackageCollector;
-use Pamald\PamaldComposer\PhpCorePackage;
-use Pamald\PamaldComposer\PhpExtPackage;
+use Pamald\PamaldComposer\PackageDependency;
+use Pamald\PamaldComposer\DependencyCollector;
+use Pamald\PamaldComposer\PhpCoreDependency;
+use Pamald\PamaldComposer\PhpExtDependency;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Sweetchuck\Utils\Filter\CustomFilter;
 
-#[CoversClass(PackageCollector::class)]
-#[CoversClass(PhpCorePackage::class)]
-#[CoversClass(PhpExtPackage::class)]
-#[CoversClass(NormalPackage::class)]
+/**
+ * @phpstan-import-type PamaldConsoleTableReporterOptions from \Pamald\Pamald\Phpstan
+ */
+#[CoversClass(DependencyCollector::class)]
+#[CoversClass(PhpCoreDependency::class)]
+#[CoversClass(PhpExtDependency::class)]
+#[CoversClass(PackageDependency::class)]
 class ConsoleTableReporterTest extends TestBase
 {
 
@@ -45,20 +46,22 @@ class ConsoleTableReporterTest extends TestBase
     {
         return [
             'basic' => [
+                // phpcs:disable Generic.Files.LineLength.TooLong
                 'expected' => <<< 'TEXT'
-                    +------+-----------+-----------+----------------+----------------+---------+---------+
-                    | Name | L Version | R Version | L Relationship | R Relationship | L Depth | R Depth |
-                    +------+-----------+-----------+----------------+----------------+---------+---------+
-                    | Direct prod                                                                        |
-                    | a/b  | 2.1.1     | 2.2.2     | prod           | prod           | direct  | direct  |
-                    | Direct dev                                                                         |
-                    | b/a  | 4.1.1     | 4.2.2     | dev            | dev            | direct  | direct  |
-                    | b/b  | 5.1.1     | 5.2.2     | dev            | dev            | direct  | direct  |
-                    | Other                                                                              |
-                    | c/a  | 3.1.1     | 3.2.2     | prod           | prod           | child   | child   |
-                    +------+-----------+-----------+----------------+----------------+---------+---------+
+                    +------+-----------+-----------+---------+---------+----------+----------+-------------+-------------+---------+---------+
+                    | Name | L Version | R Version | L Type  | R Type  | L Link   | R Link   | L Env       | R Env       | L Depth | R Depth |
+                    +------+-----------+-----------+---------+---------+----------+----------+-------------+-------------+---------+---------+
+                    | Production - Direct                                                                                                    |
+                    | a/b  | 2.1.1     | 2.2.2     | package | package | required | required | production  | production  | direct  | direct  |
+                    | Production - Indirect                                                                                                  |
+                    | c/a  | 3.1.1     | 3.2.2     | package | package | required | required | production  | production  | child   | child   |
+                    | Development - Direct                                                                                                   |
+                    | b/a  | 4.1.1     | 4.2.2     | package | package | required | required | development | development | direct  | direct  |
+                    | b/b  | 5.1.1     | 5.2.2     | package | package | required | required | development | development | direct  | direct  |
+                    +------+-----------+-----------+---------+---------+----------+----------+-------------+-------------+---------+---------+
 
                     TEXT,
+                // phpcs:enable Generic.Files.LineLength.TooLong
                 'leftLock' => [
                     'packages' => [
                         [
@@ -139,48 +142,7 @@ class ConsoleTableReporterTest extends TestBase
                         'b/b' => '^5.0',
                     ],
                 ],
-                'options' => [
-                    'groups' => [
-                        'direct-prod' => [
-                            'enabled' => true,
-                            'id' => 'direct-prod',
-                            'title' => 'Direct prod',
-                            'weight' => 0,
-                            'showEmpty' => false,
-                            'emptyContent' => '-- empty --',
-                            'filter' => (new CustomFilter())
-                                ->setOperator(function (LockDiffEntry $entry): bool {
-                                    return $entry->right?->isDirectDependency()
-                                        && $entry->right->typeOfRelationship() === 'prod';
-                                }),
-                            'comparer' => null,
-                        ],
-                        'direct-dev' => [
-                            'enabled' => true,
-                            'id' => 'direct-dev',
-                            'title' => 'Direct dev',
-                            'weight' => 1,
-                            'showEmpty' => false,
-                            'emptyContent' => '-- empty --',
-                            'filter' => (new CustomFilter())
-                                ->setOperator(function (LockDiffEntry $entry): bool {
-                                    return $entry->right?->isDirectDependency()
-                                        && $entry->right->typeOfRelationship() === 'dev';
-                                }),
-                            'comparer' => null,
-                        ],
-                        'other' => [
-                            'enabled' => true,
-                            'id' => 'other',
-                            'title' => 'Other',
-                            'weight' => 999,
-                            'showEmpty' => false,
-                            'emptyContent' => '-- empty --',
-                            'filter' => null,
-                            'comparer' => null,
-                        ],
-                    ],
-                ],
+                'options' => [],
             ],
         ];
     }
@@ -190,7 +152,7 @@ class ConsoleTableReporterTest extends TestBase
      * @param null|array<string, mixed> $leftJson
      * @param null|array<string, mixed> $rightLock
      * @param null|array<string, mixed> $rightJson
-     * @phpstan-param pamald-console-table-reporter-options $options
+     * @phpstan-param PamaldConsoleTableReporterOptions $options
      */
     #[Test]
     #[DataProvider('casesGenerate')]
@@ -207,7 +169,7 @@ class ConsoleTableReporterTest extends TestBase
         }
         $this->streams[] = $options['stream'];
 
-        $packageCollector = new PackageCollector();
+        $packageCollector = new DependencyCollector();
         $differ = new LockDiffer();
         $entries = $differ->diff(
             $packageCollector->collect($leftLock, $leftJson),

@@ -4,18 +4,24 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer;
 
-use Pamald\Pamald\PackageInterface;
-use Pamald\Pamald\PackageJsonSerializerTrait;
+use Pamald\Pamald\DependencyInterface;
+use Pamald\Pamald\DependencyJsonSerializerTrait;
+use Pamald\Pamald\DependencyType;
+use Pamald\Pamald\DependencyLink;
+use Pamald\Pamald\DependencyEnvironment;
 use Sweetchuck\Utils\VersionNumber;
 
-class PhpCorePackage implements PackageInterface
+class PhpCoreDependency implements DependencyInterface
 {
-    use PackageJsonSerializerTrait;
+    use DependencyJsonSerializerTrait;
+
+    protected DependencyType $type = DependencyType::Platform;
 
     protected ?VersionNumber $version = null;
 
     public function __construct(
-        protected ?string $typeOfRelationship = null,
+        protected ?DependencyLink $link = null,
+        protected ?DependencyEnvironment $environment = null,
         protected ?string $versionConstraint = null,
     ) {
     }
@@ -25,9 +31,19 @@ class PhpCorePackage implements PackageInterface
         return 'php';
     }
 
-    public function type(): ?string
+    public function type(): ?DependencyType
     {
-        return null;
+        return $this->type;
+    }
+
+    public function link(): ?DependencyLink
+    {
+        return $this->link;
+    }
+
+    public function environment(): ?DependencyEnvironment
+    {
+        return $this->environment;
     }
 
     public function versionString(): ?string
@@ -38,11 +54,6 @@ class PhpCorePackage implements PackageInterface
     public function version(): ?VersionNumber
     {
         return $this->version;
-    }
-
-    public function typeOfRelationship(): ?string
-    {
-        return $this->typeOfRelationship;
     }
 
     public function isDirectDependency(): ?bool

@@ -4,15 +4,20 @@ declare(strict_types = 1);
 
 namespace Pamald\PamaldComposer;
 
-use Pamald\Pamald\PackageInterface;
-use Pamald\Pamald\PackageJsonSerializerTrait;
+use Pamald\Pamald\DependencyEnvironment;
+use Pamald\Pamald\DependencyInterface;
+use Pamald\Pamald\DependencyJsonSerializerTrait;
+use Pamald\Pamald\DependencyLink;
+use Pamald\Pamald\DependencyType;
 use Sweetchuck\Utils\VersionNumber;
 
-class NormalPackage implements PackageInterface
+class PackageDependency implements DependencyInterface
 {
-    use PackageJsonSerializerTrait;
+    use DependencyJsonSerializerTrait;
 
     protected ?VersionNumber $version = null;
+
+    protected DependencyType $type = DependencyType::Package;
 
     /**
      * @phpstan-param array<string, mixed> $lockEntry
@@ -20,7 +25,8 @@ class NormalPackage implements PackageInterface
      */
     public function __construct(
         protected array $lockEntry,
-        protected ?string $typeOfRelationship = null,
+        protected ?DependencyLink $link = null,
+        protected ?DependencyEnvironment $environment = null,
         protected array $patches = [],
         protected ?string $versionConstraint = null,
     ) {
@@ -36,9 +42,19 @@ class NormalPackage implements PackageInterface
         return $this->lockEntry['name'];
     }
 
-    public function type(): ?string
+    public function type(): ?DependencyType
     {
-        return null;
+        return $this->type;
+    }
+
+    public function link(): ?DependencyLink
+    {
+        return $this->link;
+    }
+
+    public function environment(): ?DependencyEnvironment
+    {
+        return $this->environment;
     }
 
     public function versionString(): ?string
@@ -49,11 +65,6 @@ class NormalPackage implements PackageInterface
     public function version(): ?VersionNumber
     {
         return $this->version;
-    }
-
-    public function typeOfRelationship(): ?string
-    {
-        return $this->typeOfRelationship;
     }
 
     public function isDirectDependency(): ?bool
